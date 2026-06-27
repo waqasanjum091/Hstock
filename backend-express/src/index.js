@@ -66,20 +66,57 @@ app.use('/api/cart', require('./routes/cart'))
 app.use('/api/wishlist', require('./routes/wishlist'))
 app.use('/api/shipping-addresses', require('./routes/addresses'))
 
-// Orders (checkout at /api/checkout, rest at /api/orders)
+// Checkout
+const Cart = require('./models/Cart')
+const Product = require('./models/Product')
+const Order = require('./models/Order')
+const ShippingAddress = require('./models/ShippingAddress')
+
+// POST /api/checkout
+app.post('/api/checkout', protect, async (req, res) => {
+  try {
+    const { shipping_address_id, payment_method, notes } = req.body
+    if (!shipping_address_id || !payment_method)
+      return res.status(422).json({ message: 'Shipping address and payment method are required' })
+
+    const cartItems = await Cart.find({ userId: req.user._id }).populate('productId')
+    if (!cartItems.length) return res.status(422).json({ message: 'Cart is empty' })
+
+    let subtotal = 0
+    const items = []
+    for (const item of cartItems) {
+      const p = item.productId
+      if (!p || !p.in_stock || p.quantity < item.quantity)
+        return res.status(422).json({ message: `${p?.name || 'A product'} is out of stock` })
+      const price = p.discount_price || p.price
+      const total = price * item.quantity
+      subtotal += total
+      items.push({ productId: p._id, vendorId: p.vendorId, product_name: p.name, price, quantity: item.quantity, total })
+      await Product.findByIdAndUpdate(p._id, { $inc: { quantity: -item.quantity } })
+    }
+
+    const tax = +(subtotal * 0.1).toFixed(2)
+    const shipping_cost = subtotal > 100 ? 0 : 10
+    const total = +(subtotal + tax + shipping_cost).toFixed(2)
+
+    const order = await Order.create({
+      userId: req.user._id, shippingAddressId: shipping_address_id,
+      items, subtotal, tax, shipping_cost, total, payment_method, notes
+    })
+    await Cart.deleteMany({ userId: req.user._id })
+    res.status(201).json(await order.populate('shippingAddressId'))
+  } catch (err) { res.status(500).json({ message: err.message }) }
+})
+
+// Orders
 const ordersRouter = require('./routes/orders')
-app.use('/api/checkout', protect, (req, res, next) => { req.url = '/checkout'; next() }, ordersRouter)
 app.use('/api/orders', protect, ordersRouter)
 
-// Vendor routes
-const vendorRouter = require('./routes/vendor')
-app.use('/api/vendor-profile', protect, role('vendor'), (req, res, next) => {
-  if (req.method === 'GET') { req.url = '/profile'; next() }
-  else if (req.method === 'POST') { req.url = '/profile'; next() }
-  else if (req.method === 'PUT') { req.url = '/profile'; next() }
-  else next()
-}, vendorRouter)
-app.use('/api/vendor', protect, role('vendor'), vendorRouter)
+// Vendor profile CRUD
+app.use('/api/vendor-profile', protect, role('vendor'), require('./routes/vendorProfile'))
+
+// Vendor dashboard routes
+app.use('/api/vendor', protect, role('vendor'), require('./routes/vendor'))
 
 // Admin routes
 app.use('/api/admin', protect, role('super-admin'), require('./routes/admin/index'))
