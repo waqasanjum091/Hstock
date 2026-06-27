@@ -1,9 +1,0 @@
-# Place this file as /public_html/api/.htaccess on cPanel
-# It redirects requests to the Laravel public/ folder
-
-Options -Indexes
-RewriteEngine On
-
-# Redirect all requests to Laravel's public/ subfolder
-RewriteCond %{REQUEST_URI} !^/api/public/
-RewriteRule ^(.*)$ public/$1 [L]
