@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class OrderItem extends Model
+{
+    protected $fillable = [
+        'order_id',
+        'product_id',
+        'vendor_id',
+        'product_name',
+        'price',
+        'quantity',
+        'total',
+        'status',
+        'tracking_number',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'total' => 'decimal:2',
+    ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(VendorProfile::class, 'vendor_id');
+    }
+}

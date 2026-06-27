@@ -1,0 +1,23 @@
+# Backend
+backend/.env
+backend/vendor/
+backend/storage/logs/*.log
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/bootstrap/cache/*.php
+backend/database/database.sqlite
+backend/node_modules/
+
+# Frontend
+pvabrand-app/node_modules/
+pvabrand-app/dist/
+pvabrand-app/.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
