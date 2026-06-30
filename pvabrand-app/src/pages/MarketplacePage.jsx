@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { FiSearch, FiFilter, FiX } from 'react-icons/fi'
-import { products, categories } from '../data/products'
+import { categories } from '../data/products'
+import { productService } from '../services/productService'
+import { mapProduct } from '../utils/mapProduct'
 import ProductCard from '../components/ProductCard'
 import SEO from '../components/SEO'
 import { useScrollToTop, useDebounce } from '../hooks/useAnimations'
@@ -28,6 +31,12 @@ export default function MarketplacePage() {
   const [showMobileFilter, setShowMobileFilter] = useState(false)
 
   const debouncedSearch = useDebounce(searchQuery, 300)
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => productService.getAll({ per_page: 100 }),
+  })
+  const products = useMemo(() => (data?.data || []).map(mapProduct), [data])
 
   const filteredProducts = useMemo(() => {
     let result = [...products]
@@ -68,7 +77,7 @@ export default function MarketplacePage() {
     }
 
     return result
-  }, [selectedCategory, debouncedSearch, sortBy])
+  }, [products, selectedCategory, debouncedSearch, sortBy])
 
   return (
     <>
@@ -165,7 +174,12 @@ export default function MarketplacePage() {
 
             {/* Products */}
             <div className="flex-1">
-              {filteredProducts.length > 0 ? (
+              {isLoading ? (
+                <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500 mx-auto mb-4" />
+                  <p className="text-gray-500 text-sm">Loading products...</p>
+                </div>
+              ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProducts.map((product, i) => (
                     <ProductCard key={product.id} product={product} index={i} />

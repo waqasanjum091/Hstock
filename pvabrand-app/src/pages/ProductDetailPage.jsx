@@ -1,8 +1,10 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { FiStar, FiClock, FiShoppingBag, FiZap, FiCheck, FiArrowLeft, FiShield, FiTruck, FiHeadphones, FiChevronRight } from 'react-icons/fi'
-import { products } from '../data/products'
 import brandIcons from '../data/brandIcons'
+import { productService } from '../services/productService'
+import { mapProduct } from '../utils/mapProduct'
 import { useApp } from '../context/AppContext'
 import { formatPrice, getDiscountPercent } from '../utils/helpers'
 import ProductCard from '../components/ProductCard'
@@ -14,9 +16,30 @@ export default function ProductDetailPage() {
   const { slug } = useParams()
   const { openPurchaseModal } = useApp()
 
-  const product = products.find((p) => p.slug === slug)
+  const { data: raw, isLoading, isError } = useQuery({
+    queryKey: ['product', slug],
+    queryFn: () => productService.getBySlug(slug),
+    retry: 1,
+  })
+  const { data: allData } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => productService.getAll({ per_page: 100 }),
+  })
 
-  if (!product) {
+  const product = raw ? mapProduct(raw) : null
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-24 pb-20 flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4" />
+          <p className="text-gray-500">Loading product...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isError || !product) {
     return (
       <div className="min-h-screen pt-24 pb-20 flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -33,7 +56,8 @@ export default function ProductDetailPage() {
 
   const discount = getDiscountPercent(product.originalPrice, product.price)
   const brandIcon = product.iconKey ? brandIcons[product.iconKey] : null
-  const relatedProducts = products
+  const relatedProducts = (allData?.data || [])
+    .map(mapProduct)
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4)
 
@@ -73,7 +97,7 @@ export default function ProductDetailPage() {
                   </div>
                 ) : (
                   <div className="relative z-10 w-32 h-32 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <product.icon size={48} className="text-white" />
+                    <FiShoppingBag size={48} className="text-white" />
                   </div>
                 )}
                 {product.badge && (

@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { FiSearch, FiShield, FiZap, FiClock, FiHeadphones, FiArrowRight, FiCheck, FiTrendingUp, FiPackage } from 'react-icons/fi'
 import { FaShieldAlt, FaRocket, FaUsers, FaLock } from 'react-icons/fa'
-import { products, categories, testimonials, stats, faqData } from '../data/products'
+import { categories, testimonials, stats, faqData } from '../data/products'
+import { productService } from '../services/productService'
+import { mapProduct } from '../utils/mapProduct'
 import ProductCard from '../components/ProductCard'
 import CategoryCard from '../components/CategoryCard'
 import TestimonialCard from '../components/TestimonialCard'
@@ -35,10 +38,16 @@ export default function HomePage() {
   const { searchQuery, setSearchQuery } = useApp()
   const [heroSearch, setHeroSearch] = useState('')
 
+  const { data } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => productService.getAll({ per_page: 100 }),
+  })
+  const products = useMemo(() => (data?.data || []).map(mapProduct), [data])
+
   const trendingProducts = products.filter(p => p.badge === 'Best Seller').slice(0, 4)
   const newestProducts = [...products].reverse().slice(0, 4)
   const topRatedProducts = [...products].sort((a, b) => b.rating - a.rating).slice(0, 4)
-  const popularProducts = products.sort((a, b) => b.reviews - a.reviews).slice(0, 4)
+  const popularProducts = [...products].sort((a, b) => b.reviews - a.reviews).slice(0, 4)
 
   return (
     <>
