@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiX, FiSend, FiCheckCircle, FiLoader } from 'react-icons/fi'
+import { FiX, FiSend, FiCheckCircle, FiLoader, FiShoppingBag } from 'react-icons/fi'
 import { useApp } from '../context/AppContext'
 import { formatPrice } from '../utils/helpers'
+import brandIcons from '../data/brandIcons'
 import toast from 'react-hot-toast'
 
 export default function PurchaseModal() {
@@ -106,8 +107,12 @@ export default function PurchaseModal() {
               <div className="p-6">
                 {/* Product Info */}
                 <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${selectedProduct.gradient} flex items-center justify-center flex-shrink-0`}>
-                    <selectedProduct.icon size={24} className="text-white" />
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${selectedProduct.gradient} flex items-center justify-center flex-shrink-0 p-2`}>
+                    {selectedProduct.iconKey && brandIcons[selectedProduct.iconKey] ? (
+                      <div className="w-full h-full">{brandIcons[selectedProduct.iconKey].svg}</div>
+                    ) : (
+                      <FiShoppingBag size={24} className="text-white" />
+                    )}
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900">{selectedProduct.name}</h3>

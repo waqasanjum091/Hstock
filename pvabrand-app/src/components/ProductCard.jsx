@@ -45,7 +45,7 @@ export default function ProductCard({ product, index = 0 }) {
           {product.iconKey && brandIcons[product.iconKey] ? (
             <div className="w-full h-full">{brandIcons[product.iconKey].svg}</div>
           ) : (
-            <product.icon size={36} className="text-white" />
+            <FiShoppingBag size={36} className="text-white" />
           )}
         </Link>
       </div>
