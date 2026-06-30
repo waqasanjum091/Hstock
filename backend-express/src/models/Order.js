@@ -34,6 +34,14 @@ orderSchema.pre('save', function (next) {
 
 orderSchema.virtual('user', { ref: 'User', localField: 'userId', foreignField: '_id', justOne: true })
 orderSchema.virtual('shippingAddress', { ref: 'ShippingAddress', localField: 'shippingAddressId', foreignField: '_id', justOne: true })
-orderSchema.set('toJSON', { virtuals: true })
+// When a route populates the `*Id` path, also expose it under the friendly name the frontend reads.
+orderSchema.set('toJSON', {
+  virtuals: true,
+  transform(doc, ret) {
+    if (doc.populated && doc.populated('userId')) ret.user = ret.userId
+    if (doc.populated && doc.populated('shippingAddressId')) ret.shippingAddress = ret.shippingAddressId
+    return ret
+  },
+})
 
 module.exports = mongoose.model('Order', orderSchema)

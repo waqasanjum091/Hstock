@@ -31,6 +31,9 @@ router.post('/login', async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
       return res.status(422).json({ message: 'The provided credentials are incorrect.' })
     }
+    if (user.is_suspended) {
+      return res.status(403).json({ message: 'Your account has been suspended. Contact support.' })
+    }
 
     res.json({ access_token: signToken(user._id), token_type: 'Bearer', user: user.toAuthJSON() })
   } catch (err) {

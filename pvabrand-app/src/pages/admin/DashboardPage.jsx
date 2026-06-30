@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { adminService } from '../../services/adminService'
+import { LineChart, BarChart, DonutChart } from '../../components/charts/Charts'
 
 export default function AdminDashboardPage() {
   const { data, isLoading, isError, error } = useQuery({
@@ -37,13 +38,14 @@ export default function AdminDashboardPage() {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Users', value: stats.totalUsers ?? 0, icon: '👥', color: 'text-blue-600' },
           { label: 'Total Vendors', value: stats.totalVendors ?? 0, icon: '🏪', color: 'text-purple-600' },
           { label: 'Total Products', value: stats.totalProducts ?? 0, icon: '📦', color: 'text-green-600' },
           { label: 'Total Orders', value: stats.totalOrders ?? 0, icon: '📋', color: 'text-yellow-600' },
           { label: 'Pending Orders', value: stats.pendingOrders ?? 0, icon: '⏳', color: 'text-orange-600' },
+          { label: 'Open Disputes', value: stats.openDisputes ?? 0, icon: '⚠️', color: 'text-red-600' },
           { label: 'Total Revenue', value: `$${(parseFloat(stats.totalRevenue) || 0).toFixed(2)}`, icon: '💰', color: 'text-orange-600' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white p-6 rounded-lg shadow">
@@ -52,6 +54,20 @@ export default function AdminDashboardPage() {
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="mb-8">
+        <LineChart
+          title="Revenue — Last 12 Months"
+          subtitle="Paid orders, monthly"
+          data={data?.monthlyRevenue || []}
+          formatY={(v) => `$${v}`}
+        />
+      </div>
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        <BarChart title="Orders by Status" data={data?.ordersByStatus || []} />
+        <DonutChart title="Users by Role" data={data?.usersByRole || []} />
       </div>
 
       {data?.recentOrders?.length > 0 && (

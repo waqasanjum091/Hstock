@@ -2,10 +2,11 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 
 const userSchema = new mongoose.Schema({
-  name:     { type: String, required: true, trim: true },
-  email:    { type: String, required: true, unique: true, lowercase: true },
-  password: { type: String, required: true },
-  role:     { type: String, enum: ['customer', 'vendor', 'super-admin'], default: 'customer' },
+  name:         { type: String, required: true, trim: true },
+  email:        { type: String, required: true, unique: true, lowercase: true },
+  password:     { type: String, required: true },
+  role:         { type: String, enum: ['customer', 'vendor', 'super-admin'], default: 'customer' },
+  is_suspended: { type: Boolean, default: false },
 }, { timestamps: true })
 
 userSchema.pre('save', async function (next) {
@@ -25,6 +26,7 @@ userSchema.methods.toAuthJSON = function () {
     name: this.name,
     email: this.email,
     roles: [this.role],
+    is_suspended: this.is_suspended,
     created_at: this.createdAt,
     updated_at: this.updatedAt,
   }

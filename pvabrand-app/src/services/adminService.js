@@ -21,13 +21,29 @@ export const adminService = {
     return response.data
   },
 
+  // Suspend / reactivate any account (blocks login while suspended)
+  toggleSuspendUser: async (id, suspend) => {
+    const response = await api.patch(`/admin/users/${id}/suspend`, { suspend })
+    return response.data
+  },
+
   getVendors: async (filters = {}) => {
     const response = await api.get('/admin/vendors', { params: filters })
     return response.data
   },
 
+  getVendorDetail: async (id) => {
+    const response = await api.get(`/admin/vendors/${id}`)
+    return response.data
+  },
+
   approveVendor: async (id) => {
     const response = await api.patch(`/admin/vendors/${id}/approve`)
+    return response.data
+  },
+
+  rejectVendor: async (id, reason = '') => {
+    const response = await api.patch(`/admin/vendors/${id}/reject`, { reason })
     return response.data
   },
 

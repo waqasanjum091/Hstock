@@ -19,6 +19,8 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold mb-4">Quick Links</h2>
           <ul className="space-y-2">
             <li><a href="/account/orders" className="text-orange-600 hover:text-orange-700">View Orders</a></li>
+            <li><a href="/account/messages" className="text-orange-600 hover:text-orange-700">Messages</a></li>
+            <li><a href="/account/disputes" className="text-orange-600 hover:text-orange-700">Disputes &amp; Issues</a></li>
             <li><a href="/account/wishlist" className="text-orange-600 hover:text-orange-700">View Wishlist</a></li>
             <li><a href="/account/addresses" className="text-orange-600 hover:text-orange-700">Manage Addresses</a></li>
             <li><a href="/" className="text-orange-600 hover:text-orange-700">Continue Shopping</a></li>

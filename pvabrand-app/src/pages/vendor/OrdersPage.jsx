@@ -1,9 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { orderService } from '../../services/orderService'
+import { chatService } from '../../services/chatService'
 import toast from 'react-hot-toast'
 
 export default function VendorOrdersPage() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const messageCustomer = async (order) => {
+    const customerId = order.user?.id || order.user?._id || order.userId?.id || order.userId
+    if (!customerId) return toast.error('Customer not available')
+    try {
+      await chatService.startConversation({ participant_id: customerId })
+      navigate('/vendor/messages')
+    } catch {
+      toast.error('Could not start conversation')
+    }
+  }
   const { data, isLoading, isError } = useQuery({
     queryKey: ['vendor-orders'],
     queryFn: orderService.getVendorOrders,
@@ -81,6 +95,15 @@ export default function VendorOrdersPage() {
                     <p><strong>Tracking:</strong> {order.tracking_number}</p>
                   </div>
                 )}
+
+                <div className="mt-4">
+                  <button
+                    onClick={() => messageCustomer(order)}
+                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+                  >
+                    💬 Message Customer
+                  </button>
+                </div>
               </div>
             </div>
           ))}

@@ -17,6 +17,8 @@ export default function CustomerLayout() {
         <nav className="space-y-2">
           <Link to="/account" className="block px-4 py-2 rounded hover:bg-gray-800">Dashboard</Link>
           <Link to="/account/orders" className="block px-4 py-2 rounded hover:bg-gray-800">Orders</Link>
+          <Link to="/account/disputes" className="block px-4 py-2 rounded hover:bg-gray-800">Disputes</Link>
+          <Link to="/account/messages" className="block px-4 py-2 rounded hover:bg-gray-800">Messages</Link>
           <Link to="/account/wishlist" className="block px-4 py-2 rounded hover:bg-gray-800">Wishlist</Link>
           <Link to="/account/addresses" className="block px-4 py-2 rounded hover:bg-gray-800">Addresses</Link>
           <Link to="/" className="block px-4 py-2 rounded hover:bg-gray-800">Shop</Link>

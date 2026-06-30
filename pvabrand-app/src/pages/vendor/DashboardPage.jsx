@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import api from '../../services/api'
+import { BarChart } from '../../components/charts/Charts'
 
 
 export default function VendorDashboardPage() {
@@ -55,11 +56,12 @@ export default function VendorDashboardPage() {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-8">Vendor Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Products', value: stats.totalProducts ?? 0, icon: '📦' },
           { label: 'Total Orders', value: stats.totalOrders ?? 0, icon: '📋' },
           { label: 'Total Revenue', value: `$${(parseFloat(stats.totalRevenue) || 0).toFixed(2)}`, icon: '💰' },
+          { label: 'Open Disputes', value: stats.openDisputes ?? 0, icon: '⚠️' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white p-6 rounded-lg shadow">
             <div className="text-3xl mb-2">{stat.icon}</div>
@@ -69,20 +71,32 @@ export default function VendorDashboardPage() {
         ))}
       </div>
 
+      <div className="mb-8">
+        <BarChart title="Orders — Last 6 Months" subtitle="Number of orders per month" data={data?.monthlySales || []} />
+      </div>
+
       <div className="bg-white p-6 rounded-lg shadow mb-6">
         <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Link to="/vendor/products" className="p-4 border rounded hover:bg-orange-50 block">
-            <p className="font-bold">📦 Manage Products</p>
-            <p className="text-sm text-gray-600">Add, edit, or remove products</p>
+            <p className="font-bold">📦 Products</p>
+            <p className="text-sm text-gray-600">Add, edit, remove</p>
           </Link>
           <Link to="/vendor/orders" className="p-4 border rounded hover:bg-orange-50 block">
-            <p className="font-bold">📋 View Orders</p>
-            <p className="text-sm text-gray-600">Manage order fulfillment</p>
+            <p className="font-bold">📋 Orders</p>
+            <p className="text-sm text-gray-600">Fulfillment</p>
+          </Link>
+          <Link to="/vendor/disputes" className="p-4 border rounded hover:bg-orange-50 block">
+            <p className="font-bold">⚠️ Disputes</p>
+            <p className="text-sm text-gray-600">Resolve issues</p>
+          </Link>
+          <Link to="/vendor/messages" className="p-4 border rounded hover:bg-orange-50 block">
+            <p className="font-bold">💬 Messages</p>
+            <p className="text-sm text-gray-600">Chat customers</p>
           </Link>
           <Link to="/vendor/profile" className="p-4 border rounded hover:bg-orange-50 block">
-            <p className="font-bold">🏪 Store Profile</p>
-            <p className="text-sm text-gray-600">Update store information</p>
+            <p className="font-bold">🏪 Store</p>
+            <p className="text-sm text-gray-600">Profile</p>
           </Link>
         </div>
       </div>

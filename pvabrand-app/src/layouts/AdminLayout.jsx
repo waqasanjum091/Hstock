@@ -20,6 +20,7 @@ export default function AdminLayout() {
           <Link to="/admin/vendors" className="block px-4 py-2 rounded hover:bg-gray-800">Vendors</Link>
           <Link to="/admin/products" className="block px-4 py-2 rounded hover:bg-gray-800">Products</Link>
           <Link to="/admin/orders" className="block px-4 py-2 rounded hover:bg-gray-800">Orders</Link>
+          <Link to="/admin/disputes" className="block px-4 py-2 rounded hover:bg-gray-800">Disputes</Link>
           <Link to="/admin/banners" className="block px-4 py-2 rounded hover:bg-gray-800">Banners</Link>
           <Link to="/admin/inquiries" className="block px-4 py-2 rounded hover:bg-gray-800">Inquiries</Link>
           <button

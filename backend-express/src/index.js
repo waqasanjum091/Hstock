@@ -112,6 +112,10 @@ app.post('/api/checkout', protect, async (req, res) => {
 const ordersRouter = require('./routes/orders')
 app.use('/api/orders', protect, ordersRouter)
 
+// Chat (any authenticated user) & disputes
+app.use('/api/conversations', protect, require('./routes/conversations'))
+app.use('/api/disputes', protect, require('./routes/disputes'))
+
 // Vendor profile CRUD
 app.use('/api/vendor-profile', protect, role('vendor'), require('./routes/vendorProfile'))
 

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiSearch, FiShoppingBag } from 'react-icons/fi'
+import { FiMenu, FiX, FiSearch, FiShoppingBag, FiUser, FiLogOut, FiGrid, FiChevronDown } from 'react-icons/fi'
 import { useApp } from '../context/AppContext'
 
 const navLinks = [
@@ -17,8 +17,14 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuRef = useRef(null)
   const location = useLocation()
-  const { searchQuery, setSearchQuery, cartCount } = useApp()
+  const navigate = useNavigate()
+  const { searchQuery, setSearchQuery, cartCount, isAuthenticated, user, logout, isAdmin, isVendor } = useApp()
+
+  // Where the account menu "Dashboard" link should point, based on role
+  const dashboardPath = isAdmin ? '/admin' : isVendor ? '/vendor' : '/account'
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
@@ -28,7 +34,21 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsOpen(false)
+    setIsMenuOpen(false)
   }, [location])
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setIsMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
 
   return (
     <motion.nav
@@ -93,13 +113,64 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* CTA Button */}
-            <Link
-              to="/marketplace"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm hover:bg-orange-600 transition-colors shadow-sm shadow-orange-200"
-            >
-              Get Started
-            </Link>
+            {/* Auth: signed out → Sign in / Sign up */}
+            {!isAuthenticated && (
+              <div className="hidden sm:flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm hover:bg-orange-600 transition-colors shadow-sm shadow-orange-200"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
+            {/* Auth: signed in → account menu */}
+            {isAuthenticated && (
+              <div className="hidden sm:block relative" ref={menuRef}>
+                <button
+                  onClick={() => setIsMenuOpen((v) => !v)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <span className="w-7 h-7 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold uppercase">
+                    {user?.name?.charAt(0) || <FiUser size={14} />}
+                  </span>
+                  <span className="max-w-[120px] truncate">{user?.name}</span>
+                  <FiChevronDown size={14} className={`transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {isMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-2"
+                    >
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                      <Link to={dashboardPath} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                        <FiGrid size={16} className="text-orange-500" /> Dashboard
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        <FiLogOut size={16} /> Logout
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button
@@ -163,12 +234,37 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <Link
-                to="/marketplace"
-                className="block px-4 py-3 rounded-lg bg-orange-500 text-white font-semibold text-sm text-center mt-2"
-              >
-                Get Started
-              </Link>
+              {!isAuthenticated ? (
+                <div className="pt-2 mt-2 border-t border-gray-100 space-y-1">
+                  <Link
+                    to="/login"
+                    className="block px-4 py-3 rounded-lg text-gray-700 font-semibold text-sm text-center border border-gray-200"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block px-4 py-3 rounded-lg bg-orange-500 text-white font-semibold text-sm text-center"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              ) : (
+                <div className="pt-2 mt-2 border-t border-gray-100 space-y-1">
+                  <Link
+                    to={dashboardPath}
+                    className="block px-4 py-3 rounded-lg bg-orange-50 text-orange-700 font-semibold text-sm text-center"
+                  >
+                    My Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full block px-4 py-3 rounded-lg text-red-600 font-semibold text-sm text-center"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

@@ -1,14 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { orderService } from '../../services/orderService'
-import { Link } from 'react-router-dom'
-// Link kept for "Continue Shopping" button
+import { chatService } from '../../services/chatService'
 
 export default function OrdersPage() {
+  const navigate = useNavigate()
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['my-orders'],
     queryFn: orderService.getMyOrders,
     retry: 1,
   })
+
+  const messageSeller = async (order) => {
+    const vendorId = order.items?.find((i) => i.vendorId)?.vendorId
+    if (!vendorId) return toast.error('Seller not available for this order')
+    try {
+      await chatService.startConversation({ vendor_id: vendorId })
+      navigate('/account/messages')
+    } catch {
+      toast.error('Could not start conversation')
+    }
+  }
 
   if (isLoading) return <div className="p-8 text-center text-gray-500">Loading orders...</div>
   if (isError) return <div className="p-8 text-red-600">Failed to load orders.</div>
@@ -51,6 +65,21 @@ export default function OrdersPage() {
                 {order.tracking_number && (
                   <p className="text-gray-600 mt-1"><strong>Tracking:</strong> {order.tracking_number}</p>
                 )}
+              </div>
+
+              <div className="border-t mt-4 pt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => messageSeller(order)}
+                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+                >
+                  💬 Message Seller
+                </button>
+                <Link
+                  to="/account/disputes"
+                  className="px-4 py-2 rounded-lg bg-red-50 text-red-700 text-sm font-medium hover:bg-red-100"
+                >
+                  ⚠️ Report a Problem
+                </Link>
               </div>
             </div>
           ))}

@@ -27,6 +27,15 @@ const productSchema = new mongoose.Schema({
 productSchema.virtual('vendor', { ref: 'VendorProfile', localField: 'vendorId', foreignField: '_id', justOne: true })
 productSchema.virtual('category', { ref: 'Category', localField: 'categoryId', foreignField: '_id', justOne: true })
 productSchema.virtual('brand', { ref: 'Brand', localField: 'brandId', foreignField: '_id', justOne: true })
-productSchema.set('toJSON', { virtuals: true })
+// Expose populated `*Id` paths under the friendly names the frontend reads.
+productSchema.set('toJSON', {
+  virtuals: true,
+  transform(doc, ret) {
+    if (doc.populated && doc.populated('vendorId')) ret.vendor = ret.vendorId
+    if (doc.populated && doc.populated('categoryId')) ret.category = ret.categoryId
+    if (doc.populated && doc.populated('brandId')) ret.brand = ret.brandId
+    return ret
+  },
+})
 
 module.exports = mongoose.model('Product', productSchema)

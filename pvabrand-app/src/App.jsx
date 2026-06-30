@@ -34,6 +34,7 @@ import AdminProducts from './pages/admin/ProductsPage'
 import AdminOrders from './pages/admin/OrdersPage'
 import AdminBanners from './pages/admin/BannersPage'
 import AdminInquiries from './pages/admin/InquiriesPage'
+import AdminDisputes from './pages/admin/DisputesPage'
 
 // Vendor Pages
 import VendorLayout from './layouts/VendorLayout'
@@ -42,6 +43,8 @@ import VendorProducts from './pages/vendor/ProductsPage'
 import VendorAddProduct from './pages/vendor/AddProductPage'
 import VendorOrders from './pages/vendor/OrdersPage'
 import VendorProfile from './pages/vendor/ProfilePage'
+import VendorDisputes from './pages/vendor/DisputesPage'
+import VendorMessages from './pages/vendor/MessagesPage'
 
 // Customer Pages
 import CustomerLayout from './layouts/CustomerLayout'
@@ -49,6 +52,8 @@ import CustomerDashboard from './pages/account/DashboardPage'
 import CustomerOrders from './pages/account/OrdersPage'
 import CustomerWishlist from './pages/account/WishlistPage'
 import CustomerAddresses from './pages/account/AddressesPage'
+import CustomerDisputes from './pages/account/DisputesPage'
+import CustomerMessages from './pages/account/MessagesPage'
 
 function PublicLayout({ children }) {
   return (
@@ -175,6 +180,7 @@ export default function App() {
           <Route path="vendors" element={<AdminVendors />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="disputes" element={<AdminDisputes />} />
           <Route path="banners" element={<AdminBanners />} />
           <Route path="inquiries" element={<AdminInquiries />} />
         </Route>
@@ -192,6 +198,8 @@ export default function App() {
           <Route path="products" element={<VendorProducts />} />
           <Route path="products/add" element={<VendorAddProduct />} />
           <Route path="orders" element={<VendorOrders />} />
+          <Route path="disputes" element={<VendorDisputes />} />
+          <Route path="messages" element={<VendorMessages />} />
           <Route path="profile" element={<VendorProfile />} />
         </Route>
 
@@ -206,6 +214,8 @@ export default function App() {
         >
           <Route index element={<CustomerDashboard />} />
           <Route path="orders" element={<CustomerOrders />} />
+          <Route path="disputes" element={<CustomerDisputes />} />
+          <Route path="messages" element={<CustomerMessages />} />
           <Route path="wishlist" element={<CustomerWishlist />} />
           <Route path="addresses" element={<CustomerAddresses />} />
         </Route>

@@ -48,6 +48,12 @@ export default function VendorLayout() {
           <Link to="/vendor/orders" className={`block px-4 py-2 rounded text-sm ${isActive('/vendor/orders')}`}>
             📋 Orders
           </Link>
+          <Link to="/vendor/disputes" className={`block px-4 py-2 rounded text-sm ${isActive('/vendor/disputes')}`}>
+            ⚠️ Disputes
+          </Link>
+          <Link to="/vendor/messages" className={`block px-4 py-2 rounded text-sm ${isActive('/vendor/messages')}`}>
+            💬 Messages
+          </Link>
           <Link to="/vendor/profile" className={`block px-4 py-2 rounded text-sm ${isActive('/vendor/profile')}`}>
             🏪 Store Profile
           </Link>

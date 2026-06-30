@@ -6,8 +6,10 @@ export const chatService = {
     return response.data
   },
 
-  startConversation: async (participantId) => {
-    const response = await api.post('/conversations', { participant_id: participantId })
+  // Accepts a user id (string) or an options object: { participant_id } | { vendor_id }
+  startConversation: async (target) => {
+    const payload = typeof target === 'object' ? target : { participant_id: target }
+    const response = await api.post('/conversations', payload)
     return response.data
   },
 
