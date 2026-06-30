@@ -23,12 +23,13 @@ function ChartCard({ title, subtitle, children }) {
 export function LineChart({ title, subtitle, data = [], color = '#f97316', formatY = (v) => v }) {
   const w = 560, h = 220, pad = { t: 16, r: 16, b: 28, l: 44 }
   const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b
-  const max = Math.max(1, ...data.map((d) => d.value))
+  const val = (d) => Number(d.value) || 0
+  const max = Math.max(1, ...data.map(val))
   const stepX = data.length > 1 ? iw / (data.length - 1) : iw
   const x = (i) => pad.l + i * stepX
   const y = (v) => pad.t + ih - (v / max) * ih
 
-  const points = data.map((d, i) => `${x(i)},${y(d.value)}`).join(' ')
+  const points = data.map((d, i) => `${x(i)},${y(val(d))}`).join(' ')
   const area = data.length
     ? `M${pad.l},${pad.t + ih} L${points.split(' ').join(' L')} L${x(data.length - 1)},${pad.t + ih} Z`
     : ''
@@ -50,7 +51,7 @@ export function LineChart({ title, subtitle, data = [], color = '#f97316', forma
           <polyline points={points} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
           {data.map((d, i) => (
             <g key={i}>
-              <circle cx={x(i)} cy={y(d.value)} r="3.5" fill="#fff" stroke={color} strokeWidth="2" />
+              <circle cx={x(i)} cy={y(val(d))} r="3.5" fill="#fff" stroke={color} strokeWidth="2" />
               <text x={x(i)} y={h - 8} textAnchor="middle" fontSize="10" fill="#94a3b8">{d.month}</text>
             </g>
           ))}

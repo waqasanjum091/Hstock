@@ -30,7 +30,7 @@ router.get('/dashboard', async (req, res) => {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
       const label = d.toLocaleString('en-US', { month: 'short' })
       const orders = await Order.find({ payment_status: 'paid', createdAt: { $gte: d, $lt: new Date(d.getFullYear(), d.getMonth() + 1, 1) } })
-      monthlyRevenue.push({ month: label, revenue: +orders.reduce((s, o) => s + o.total, 0).toFixed(2) })
+      monthlyRevenue.push({ month: label, value: +orders.reduce((s, o) => s + o.total, 0).toFixed(2) })
     }
 
     // Orders grouped by status — for the dashboard bar chart
